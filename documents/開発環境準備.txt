@@ -1,0 +1,115 @@
+# VSCode拡張機能開発環境準備手順
+
+## 1. 前提条件の確認
+1. Node.jsのインストール
+   - バージョン18以上を推奨
+   - インストール後、ターミナルで以下を確認
+     node --version
+     npm --version
+   ※バージョンが表示されることを確認
+
+2. VSCodeのインストール
+   - 最新版を推奨
+   - 日本語化は任意（エラーメッセージは英語で検索する方が情報が多い）
+
+3. Gitのインストール
+   - 最新版を推奨
+   - インストール後、ターミナルで確認
+     git --version
+
+## 2. VSCode拡張機能開発用の拡張機能インストール
+1. 必須拡張機能
+   - ESLint
+   - Prettier
+   - TypeScript and JavaScript Language Features
+   - Extension Test Runner
+
+2. 推奨拡張機能
+   - GitLens
+   - Error Lens
+   - Todo Tree
+   - vscode-icons
+
+## 3. プロジェクトの作成
+1. Yeomanとジェネレーターのインストール
+   npm install -g yo generator-code
+   ※エラーが出る場合は管理者権限で実行
+
+2. プロジェクト用フォルダの作成
+   - デスクトップなど分かりやすい場所に作成
+   - 日本語パスは避ける
+   - スペースを含まないフォルダ名を推奨
+
+3. プロジェクトの生成
+   - フォルダ内で以下を実行
+     yo code
+   - 対話形式の質問に回答
+     - New Extension (TypeScript)を選択
+     - 拡張機能の名前を入力（例：google-calendar-viewer）
+     - 説明文を入力
+     - 他はデフォルトでOK
+
+## 4. 開発環境の設定
+1. 依存パッケージのインストール
+   npm install googleapis js-yaml dayjs
+
+2. 開発用パッケージのインストール
+   npm install -D @types/js-yaml @types/node
+
+3. VSCode設定の調整
+   - .vscode/settings.jsonを開く
+   - 以下を追加
+     {
+       "editor.formatOnSave": true,
+       "editor.defaultFormatter": "esbenp.prettier-vscode",
+       "typescript.tsdk": "node_modules/typescript/lib"
+     }
+
+## 5. デバッグ環境の確認
+1. F5キーでデバッグ起動
+   - 新しいVSCodeウィンドウが開くことを確認
+   - エラーが出ないことを確認
+
+2. デバッグコンソールの確認
+   - デバッグコンソールタブを開く
+   - エラーが出ていないことを確認
+
+## 6. よくあるトラブル対応
+1. npm installでエラー
+   - node_modulesフォルダを削除
+   - package-lock.jsonを削除
+   - npm cache clean --force
+   - 再度npm install
+
+2. デバッグ起動できない
+   - VSCodeを再起動
+   - .vscode/launch.jsonの存在確認
+   - タスクマネージャーでVSCodeプロセス確認
+
+3. TypeScriptエラー
+   - node_modules/.binのtscバージョン確認
+   - tsconfig.jsonの設定確認
+   - npm install -D typescript@latest
+
+## 7. コーディング開始前の確認
+1. ソースコード構成の確認
+   - src/extension.tsがエントリーポイント
+   - package.jsonの設定内容
+   - README.mdの内容
+
+2. Gitの初期設定
+   - git init
+   - .gitignoreの確認
+   - 初期コミット
+
+3. 動作確認方法
+   - F5でデバッグ開始
+   - Ctrl+Shift+Pでコマンドパレット表示
+   - Hello Worldコマンドの動作確認
+
+※注意点
+- パスに日本語を使用しない
+- VSCode拡張機能のAPIドキュメントを常に参照
+- エラーメッセージは必ずコピーして検索
+- node_modulesは絶対にGit管理しない
+- package.jsonの変更は慎重に 

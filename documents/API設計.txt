@@ -1,0 +1,94 @@
+# API設計書
+
+## 1. 内部API
+### 1.1 カレンダー管理API
+#### updateCalendars
+- 概要: 全カレンダーの情報を更新
+- パス: internal://calendar/update
+- メソッド: POST
+- パラメータ: なし
+- レスポンス:
+  - 200: 更新成功
+  - 500: 更新失敗
+
+#### fetchCalendarEvents
+- 概要: 特定のカレンダーの予定を取得
+- パス: internal://calendar/events
+- メソッド: GET
+- パラメータ:
+  - calendarId: string
+  - startDate: string (YYYY-MM-DD)
+  - endDate: string (YYYY-MM-DD)
+- レスポンス:
+  - 200: イベント一覧
+  - 404: カレンダー未找
+  - 500: 取得失敗
+
+### 1.2 ファイル管理API
+#### writeCalendarFile
+- 概要: カレンダー情報をファイルに保存
+- パス: internal://file/write
+- メソッド: POST
+- パラメータ:
+  - calendarData: CalendarData
+- レスポンス:
+  - 200: 保存成功
+  - 500: 保存失敗
+
+#### readCalendarFile
+- 概要: カレンダーファイルを読み込み
+- パス: internal://file/read
+- メソッド: GET
+- パラメータ:
+  - path: string
+- レスポンス:
+  - 200: ファイル内容
+  - 404: ファイル未找
+  - 500: 読み込み失敗
+
+## 2. 外部API（Google Calendar）
+### 2.1 認証
+#### getAccessToken
+- エンドポイント: https://oauth2.googleapis.com/token
+- メソッド: POST
+- ヘッダー:
+  - Content-Type: application/x-www-form-urlencoded
+- パラメータ:
+  - client_id: string
+  - client_secret: string
+  - refresh_token: string
+  - grant_type: "refresh_token"
+
+### 2.2 カレンダーAPI
+#### listEvents
+- エンドポイント: https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events
+- メソッド: GET
+- ヘッダー:
+  - Authorization: Bearer {access_token}
+- パラメータ:
+  - timeMin: string (ISO 8601)
+  - timeMax: string (ISO 8601)
+  - singleEvents: true
+  - orderBy: "startTime"
+
+## 3. エラーハンドリング
+### 3.1 共通エラーレスポンス
+- フォーマット:
+  - code: エラーコード
+  - message: エラーメッセージ
+  - details: エラー詳細（オプション）
+
+### 3.2 エラーコード
+- E001: API認証エラー
+- E002: パラメータ不正
+- E003: ファイル操作エラー
+- E004: ネットワークエラー
+- E005: タイムアウト
+
+## 4. レート制限
+### 4.1 Google Calendar API
+- クォータ: ユーザーごとに1日あたり1,000,000クエリ
+- 同時リクエスト: 最大10
+- リトライ戦略:
+  - 429エラー時: 指数バックオフ
+  - 最大再試行回数: 3回 

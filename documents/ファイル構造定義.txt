@@ -1,0 +1,48 @@
+# ファイル構造定義
+
+## 1. YAMLファイル構造
+### 1.1 メタデータ
+| フィールド名   | 型     | 必須  | デフォルト値 | 説明                    |
+|---------------|--------|-------|-------------|------------------------|
+| date          | string | Yes   | -           | 日付（YYYY-MM-DD形式）   |
+| timezone      | string | Yes   | Asia/Tokyo  | タイムゾーン            |
+| calendar_id   | string | Yes   | -           | GoogleカレンダーのID     |
+| calendar_name | string | Yes   | -           | カレンダーの表示名       |
+
+### 1.2 イベント配列
+| フィールド名  | 型     | 必須  | デフォルト値 | 説明                     |
+|--------------|--------|-------|-------------|--------------------------|
+| title        | string | Yes   | -           | イベントのタイトル         |
+| start        | string | Yes   | -           | 開始時刻（ISO 8601形式）   |
+| end          | string | Yes   | -           | 終了時刻（ISO 8601形式）   |
+| location     | string | No    | ""          | 場所                     |
+| description  | string | No    | ""          | 備考                     |
+
+## 2. 設定ファイル構造
+### 2.1 カレンダー設定
+| フィールド名 | 型     | 必須  | デフォルト値 | 説明                    |
+|-------------|--------|-------|-------------|------------------------|
+| id          | string | Yes   | -           | GoogleカレンダーのID     |
+| name        | string | Yes   | -           | カレンダーの表示名       |
+
+### 2.2 一般設定
+| フィールド名        | 型    | 必須  | デフォルト値 | 説明                    |
+|-------------------|-------|-------|-------------|------------------------|
+| updateInterval    | number| Yes   | 10          | 更新間隔（分）           |
+| pastMonths       | number| Yes   | 3           | 過去データ保持期間（月）   |
+| futureMonths     | number| Yes   | 3           | 未来データ取得期間（月）   |
+| timezone         | string| Yes   | Asia/Tokyo  | タイムゾーン            |
+| retryCount       | number| Yes   | 3           | エラー時の再試行回数      |
+| retryInterval    | number| Yes   | 1           | 再試行間隔（分）         |
+
+## 3. ディレクトリ構造 
+googlecalendar/
+├── {カレンダー名1}/
+│ ├── YYYYMMDD.yml
+│ ├── YYYYMMDD.yml
+│ └── ...
+├── {カレンダー名2}/
+│ ├── YYYYMMDD.yml
+│ ├── YYYYMMDD.yml
+│ └── ...
+└── ...

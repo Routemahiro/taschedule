@@ -1,0 +1,107 @@
+# 共通コンポーネント定義
+
+## 1. UIコンポーネント
+### 1.1 StatusBarItem
+- 用途: ステータスバーでの状態表示
+- Props:
+  - text: 表示テキスト
+  - icon: アイコン種類
+  - command: クリック時のコマンド
+- イベント: クリック
+- 使用例: カレンダー更新状態の表示
+
+### 1.2 ProgressBar
+- 用途: 処理進行状況の表示
+- Props:
+  - message: 表示メッセージ
+  - increment: 進捗率
+- イベント: なし
+- 使用例: カレンダー情報取得時の進捗表示
+
+## 2. ユーティリティ
+### 2.1 CalendarManager
+- 機能: カレンダー情報の取得・管理
+- メソッド:
+  - fetchEvents(calendarId: string): Promise<Event[]>
+  - updateCalendars(): Promise<void>
+  - cleanupOldFiles(): Promise<void>
+- 使用例: 定期更新処理、手動更新処理
+
+### 2.2 FileManager
+- 機能: YAMLファイルの読み書き
+- メソッド:
+  - writeCalendarFile(data: CalendarData): Promise<void>
+  - readCalendarFile(path: string): Promise<CalendarData>
+  - deleteOldFiles(beforeDate: Date): Promise<void>
+- 使用例: カレンダー情報の保存、古いファイルの削除
+
+### 2.3 ConfigManager
+- 機能: 設定情報の管理
+- メソッド:
+  - getConfig(): Settings
+  - updateConfig(settings: Partial<Settings>): void
+  - validateConfig(): boolean
+  - validateGoogleAuth(): boolean
+  - validateCalendarConfig(): boolean
+  - validateTimeSettings(): boolean
+- 使用例: 設定の読み込み、更新
+
+### 2.4 Logger
+- 機能: ログ出力管理
+- メソッド:
+  - info(message: string): void
+  - error(error: Error): void
+  - debug(message: string): void
+- 使用例: エラー記録、処理状況の記録
+
+## 3. 型定義
+### 3.1 Settings
+export interface Settings {
+    calendars: CalendarConfig[];
+    updateInterval: number;
+    pastMonths: number;
+    futureMonths: number;
+    timezone: string;
+    retryCount: number;
+    retryInterval: number;
+    googleAuth: {
+        clientId: string;
+        clientSecret: string;
+        refreshToken: string;
+    };
+}
+
+### 3.2 CalendarData
+export interface CalendarData {
+    date: string;
+    timezone: string;
+    calendar_id: string;
+    calendar_name: string;
+    events: Event[];
+}
+
+### 3.3 Event
+export interface Event {
+    title: string;
+    start: string;
+    end: string;
+    location?: string;
+    description?: string;
+}
+
+## 4. 定数
+### 4.1 設定のデフォルト値
+export const DEFAULT_SETTINGS: Settings = {
+    calendars: [],
+    updateInterval: 10,
+    pastMonths: 3,
+    futureMonths: 3,
+    timezone: "Asia/Tokyo",
+    retryCount: 3,
+    retryInterval: 1,
+    googleAuth: {
+        clientId: "",
+        clientSecret: "",
+        refreshToken: ""
+    }
+};
