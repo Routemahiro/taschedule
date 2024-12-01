@@ -1,7 +1,7 @@
 {
   "name": "taschedule",
   "displayName": "taschedule",
-  "description": "",
+  "description": "Google Calendar events to YAML converter",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.95.0"
@@ -10,16 +10,86 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:taschedule.helloWorld"
+    "workspaceContains:**/googlecalendar/**",
+    "onCommand:taschedule.refresh",
+    "onCommand:taschedule.configure",
+    "onCommand:taschedule.showLogs"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "taschedule.helloWorld",
-        "title": "Hello World"
+        "command": "taschedule.refresh",
+        "title": "Taschedule: Refresh Calendars",
+        "category": "Taschedule",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "taschedule.configure",
+        "title": "Taschedule: Configure Settings",
+        "category": "Taschedule",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "taschedule.showLogs",
+        "title": "Taschedule: Show Logs",
+        "category": "Taschedule",
+        "icon": "$(output)"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Taschedule",
+      "properties": {
+        "taschedule.updateInterval": {
+          "type": "number",
+          "default": 10,
+          "description": "Update interval in minutes"
+        },
+        "taschedule.pastMonths": {
+          "type": "number",
+          "default": 3,
+          "description": "Number of past months to fetch"
+        },
+        "taschedule.futureMonths": {
+          "type": "number",
+          "default": 3,
+          "description": "Number of future months to fetch"
+        },
+        "taschedule.timezone": {
+          "type": "string",
+          "default": "Asia/Tokyo",
+          "description": "Timezone for calendar events"
+        },
+        "taschedule.retryCount": {
+          "type": "number",
+          "default": 3,
+          "description": "Number of retry attempts"
+        },
+        "taschedule.retryInterval": {
+          "type": "number",
+          "default": 1,
+          "description": "Retry interval in minutes"
+        },
+        "taschedule.calendars": {
+          "type": "array",
+          "default": [],
+          "description": "List of calendar configurations",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Calendar ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -29,22 +99,27 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
+    "@types/vscode": "^1.95.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
-    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
+    "eslint": "^9.13.0",
+    "typescript": "^5.6.3",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.13.0",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.6.3",
-    "webpack": "^5.95.0",
-    "webpack-cli": "^5.1.4"
+    "@types/js-yaml": "^4.0.9"
+  },
+  "dependencies": {
+    "googleapis": "^129.0.0",
+    "js-yaml": "^4.1.0",
+    "dayjs": "^1.11.10"
   }
 }
