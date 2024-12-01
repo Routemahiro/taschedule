@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { logger } from '../utils/logger';
-import { ExtensionConfig } from '../types';
+import { IExtensionConfig, ErrorCode, createError } from '../types';
 
 export class ConfigManager {
     private static instance: ConfigManager;
-    private config: ExtensionConfig;
+    private config: IExtensionConfig;
 
     private constructor() {
         this.config = this.loadConfig();
@@ -17,25 +17,43 @@ export class ConfigManager {
         return ConfigManager.instance;
     }
 
-    private loadConfig(): ExtensionConfig {
-        const config = vscode.workspace.getConfiguration('taschedule');
-        return {
-            updateInterval: config.get('updateInterval', 10),
-            pastMonths: config.get('pastMonths', 3),
-            futureMonths: config.get('futureMonths', 3),
-            timezone: config.get('timezone', 'Asia/Tokyo'),
-            retryCount: config.get('retryCount', 3),
-            retryInterval: config.get('retryInterval', 1),
-            calendars: config.get('calendars', [])
-        };
+    private loadConfig(): IExtensionConfig {
+        try {
+            const config = vscode.workspace.getConfiguration('taschedule');
+            return {
+                updateInterval: config.get('updateInterval', 10),
+                pastMonths: config.get('pastMonths', 3),
+                futureMonths: config.get('futureMonths', 3),
+                timezone: config.get('timezone', 'Asia/Tokyo'),
+                retryCount: config.get('retryCount', 3),
+                retryInterval: config.get('retryInterval', 1),
+                calendars: config.get('calendars', [])
+            };
+        } catch (error) {
+            throw createError(
+                ErrorCode.CONFIG_ERROR,
+                'Failed to load configuration',
+                error,
+                false
+            );
+        }
     }
 
-    public getConfig(): ExtensionConfig {
+    public getConfig(): IExtensionConfig {
         return this.config;
     }
 
     public async updateConfig(): Promise<void> {
-        logger.info('CONFIG', 'Updating configuration');
-        this.config = this.loadConfig();
+        try {
+            logger.info('CONFIG', 'Updating configuration');
+            this.config = this.loadConfig();
+        } catch (error) {
+            throw createError(
+                ErrorCode.CONFIG_ERROR,
+                'Failed to update configuration',
+                error,
+                true
+            );
+        }
     }
 } 
