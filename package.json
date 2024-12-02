@@ -119,7 +119,7 @@
   },
   "dependencies": {
     "googleapis": "^129.0.0",
-    "js-yaml": "^4.1.0",
+    "google-auth-library": "^9.4.1",
     "dayjs": "^1.11.10"
   }
 }

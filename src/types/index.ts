@@ -3,8 +3,8 @@ export interface ICalendarEvent {
     title: string;
     start: string;  // ISO 8601形式
     end: string;    // ISO 8601形式
-    location?: string;
-    description?: string;
+    location?: string | null;
+    description?: string | null;
 }
 
 // カレンダー設定の型定義
