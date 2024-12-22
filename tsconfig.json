@@ -20,7 +20,8 @@
 		],
 		"types": [
 			"node",
-			"vscode"
+			"vscode",
+			"mocha"
 		]
 	},
 	"exclude": ["node_modules", ".vscode-test"]

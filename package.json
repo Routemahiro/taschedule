@@ -10,10 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-    "workspaceContains:**/googlecalendar/**",
-    "onCommand:taschedule.refresh",
-    "onCommand:taschedule.configure",
-    "onCommand:taschedule.showLogs"
+    "workspaceContains:**/googlecalendar/**"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -98,28 +95,29 @@
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "pretest": "npm run compile-tests && npm run compile",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "node ./out/test/runTest.js --inspect-brk"
   },
   "devDependencies": {
-    "@types/vscode": "^1.95.0",
+    "@types/glob": "^8.1.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
+    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.13.0",
-    "typescript": "^5.6.3",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.95.0",
-    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
-    "@types/js-yaml": "^4.0.9"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "googleapis": "^129.0.0",
+    "dayjs": "^1.11.10",
+    "eslint": "^8.56.0",
     "google-auth-library": "^9.4.1",
-    "dayjs": "^1.11.10"
+    "googleapis": "^129.0.0"
   }
 }

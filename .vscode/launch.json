@@ -11,8 +11,7 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--trace-warnings",
-				"--trace-deprecation"
+				"${workspaceFolder}/.vscode-test/test-workspace"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -23,6 +22,20 @@
 			"env": {
 				"VSCODE_DEBUG_MODE": "true"
 			}
+		},
+		{
+			"name": "Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+				"${workspaceFolder}/.vscode-test/test-workspace"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/**/*.js"
+			],
+			"preLaunchTask": "npm: compile"
 		}
 	]
 }

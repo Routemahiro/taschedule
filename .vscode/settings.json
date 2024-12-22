@@ -9,5 +9,15 @@
 		"dist": true // set this to false to include "dist" folder in search results
 	},
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off"
+	"typescript.tsc.autoDetect": "off",
+	"taschedule.calendars": [
+		{
+			"id": "test@example.com",
+			"name": "TestCalendar"
+		}
+	],
+	"taschedule.updateInterval": 5,
+	"taschedule.timezone": "Asia/Tokyo",
+	"taschedule.pastMonths": 1,
+	"taschedule.futureMonths": 1
 }

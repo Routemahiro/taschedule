@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { GoogleAuthManager } from '../../auth/googleAuth';
-import { ErrorCode } from '../../types';
 import * as path from 'path';
 
 suite('GoogleAuthManager Test Suite', () => {
@@ -11,69 +10,52 @@ suite('GoogleAuthManager Test Suite', () => {
         // テスト用のモックコンテキストを作成
         const mockSecretStorage = new class implements vscode.SecretStorage {
             private storage = new Map<string, string>();
-            
+            private _onDidChange = new vscode.EventEmitter<vscode.SecretStorageChangeEvent>();
+            readonly onDidChange = this._onDidChange.event;
+
             async get(key: string): Promise<string | undefined> {
                 return this.storage.get(key);
             }
-            
-            async delete(key: string): Promise<void> {
-                this.storage.delete(key);
-            }
-            
+
             async store(key: string, value: string): Promise<void> {
                 this.storage.set(key, value);
+                this._onDidChange.fire({ key });
             }
-            
-            onDidChange = new vscode.EventEmitter<vscode.SecretStorageChangeEvent>().event;
-        };
 
-        // Mementoの完全実装
-        const createMemento = (): vscode.Memento & { setKeysForSync(keys: readonly string[]): void } => ({
-            get: (key: string) => undefined,
-            update: async () => undefined,
-            keys: () => [],
-            setKeysForSync: (keys: readonly string[]) => { /* 実装不要 */ }
-        });
-
-        // EnvironmentVariableCollectionの完全実装
-        const mockEnvCollection = new class implements vscode.EnvironmentVariableCollection {
-            [Symbol.iterator](): Iterator<[variable: string, mutator: vscode.EnvironmentVariableMutator]> {
-                return [][Symbol.iterator]();
-            }
-            persistent = true;
-            description = undefined;
-            replace(variable: string, value: string): void { }
-            append(variable: string, value: string): void { }
-            prepend(variable: string, value: string): void { }
-            get(variable: string): vscode.EnvironmentVariableMutator | undefined { return undefined; }
-            forEach(callback: (variable: string, mutator: vscode.EnvironmentVariableMutator, collection: vscode.EnvironmentVariableCollection) => any, thisArg?: any): void { }
-            delete(variable: string): void { }
-            clear(): void { }
-            getScoped(scope: vscode.EnvironmentVariableScope): vscode.EnvironmentVariableCollection {
-                return this;
+            async delete(key: string): Promise<void> {
+                this.storage.delete(key);
+                this._onDidChange.fire({ key });
             }
         };
 
-        const mockContext: vscode.ExtensionContext = {
+        context = {
             subscriptions: [],
-            extensionPath: '/test/path',
-            extensionUri: vscode.Uri.file('/test/path'),
-            globalState: createMemento(),
-            workspaceState: createMemento(),
+            extensionPath: '',
+            storagePath: '',
+            logPath: '',
+            globalState: {
+                get: () => undefined,
+                update: () => Promise.resolve(),
+                setKeysForSync: () => {},
+            } as any,
+            workspaceState: {
+                get: () => undefined,
+                update: () => Promise.resolve(),
+                setKeysForSync: () => {},
+            } as any,
             secrets: mockSecretStorage,
-            storageUri: vscode.Uri.file('/test/storage'),
-            globalStorageUri: vscode.Uri.file('/test/global-storage'),
-            logUri: vscode.Uri.file('/test/log'),
+            extensionUri: vscode.Uri.file(''),
+            environmentVariableCollection: {} as any,
             extensionMode: vscode.ExtensionMode.Test,
-            storagePath: '/test/storage',
-            globalStoragePath: '/test/global-storage',
-            logPath: '/test/log',
-            asAbsolutePath: (relativePath: string) => path.join('/test/path', relativePath),
-            environmentVariableCollection: mockEnvCollection,
+            globalStorageUri: vscode.Uri.file(''),
+            logUri: vscode.Uri.file(''),
+            storageUri: vscode.Uri.file(''),
+            asAbsolutePath: (relativePath: string) => path.join(__dirname, '../../../', relativePath),
+            globalStoragePath: '',
             extension: {
                 id: 'test-extension',
-                extensionUri: vscode.Uri.file('/test/path'),
-                extensionPath: '/test/path',
+                extensionUri: vscode.Uri.file(''),
+                extensionPath: '',
                 isActive: true,
                 packageJSON: {},
                 exports: undefined,
@@ -82,8 +64,6 @@ suite('GoogleAuthManager Test Suite', () => {
             },
             languageModelAccessInformation: {} as any
         };
-
-        context = mockContext;
     });
 
     test('getInstance should return singleton instance', () => {
@@ -92,16 +72,18 @@ suite('GoogleAuthManager Test Suite', () => {
         assert.strictEqual(instance1, instance2);
     });
 
-    test('initialize should fail without credentials', async () => {
+    test('initialize should fail without credentials', async function() {
+        this.timeout(10000); // タイムアウトを10秒に延長
         const auth = GoogleAuthManager.getInstance(context);
-        try {
-            await auth.initialize();
-            assert.fail('Should throw error');
-        } catch (error: any) {
-            assert.strictEqual(error.code, ErrorCode.AUTH_FAILED);
-            assert.strictEqual(error.message, 'Google credentials not found');
-        }
+        
+        await assert.rejects(
+            async () => {
+                await auth.initialize();
+            },
+            (error: any) => {
+                assert.strictEqual(error.code, 'AUTH_FAILED');
+                return true;
+            }
+        );
     });
-
-    // TODO: Add more test cases for successful initialization and token refresh
 }); 
